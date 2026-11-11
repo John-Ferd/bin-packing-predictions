@@ -1,5 +1,7 @@
 # bin-packing-predictions
 
+[![CI](https://github.com/John-Ferd/bin-packing-predictions/actions/workflows/ci.yml/badge.svg)](https://github.com/John-Ferd/bin-packing-predictions/actions/workflows/ci.yml) ![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+
 Online bin packing, where items arrive one at a time and each must be put in a bin immediately and for good, with and without **predictions** of how often each item size will appear. The repo implements the classic algorithms (Next Fit, First Fit, Best Fit) and the prediction-based *ProfilePacking* and *Hybrid(λ)* of Angelopoulos, Kamali & Shadkami (IJCAI 2022), then measures the core trade-off in learning-augmented algorithms: how much you gain when predictions are good, and how much you lose when they are bad.
 
 ## In one paragraph
@@ -40,6 +42,19 @@ The setup: 100,000 items with integer sizes from round(45·Weibull(3)), bins of 
 - **Too few samples hurt pure ProfilePacking.** With s = 100 there are about 70 sizes that occur regularly but only 100 observations, so many sizes get a frequency of 0 or 1/100. The profile is a poor plan, and the algorithm keeps opening new profile groups.
 - **Small samples can look better than medium ones.** With s = 10 most sizes are missing from the prediction, so most items go straight to the First Fit fallback, which is why s = 10 looks better than s = 100.
 - Hybrid(0.5) beats First Fit once the sample has about 1,000 items. Pure ProfilePacking needs about 10,000.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  P["predicted size frequencies"] --> PR["profile<br/>packed offline with<br/>First Fit Decreasing"]
+  I["items arrive one at a time"] --> H{"Hybrid(λ)<br/>route each item"}
+  H -->|"λ share of each size"| PP["ProfilePacking<br/>fill profile slots"]
+  H -->|"the rest"| FF["First Fit"]
+  PR --> PP
+  PP --> B["bins used vs lower bound"]
+  FF --> B
+```
 
 ## How the algorithms work
 
