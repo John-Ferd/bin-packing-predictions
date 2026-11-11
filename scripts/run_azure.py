@@ -30,6 +30,7 @@ import numpy as np
 
 from binpacking import best_fit, first_fit, hybrid, l1_error, lower_bound, next_fit, profile_packing, true_frequencies
 from binpacking.azure import load_azure_items
+from binpacking.env import environment
 
 K = 100
 MACHINES = {21: "most requests (typical traffic)", 28: "largest average VM size"}
@@ -97,6 +98,7 @@ def main():
            "instances": "each day of week 2 (days 7-13), real arrival order",
            "profile_size_m": args.m,
            "machines": {m: {"why": MACHINES[m], **meta[m], "ratio_to_lower_bound": summary[m]} for m in MACHINES}}
+    res["environment"] = environment()
     (out / "azure_results.json").write_text(json.dumps(res, indent=2))
 
     for m in MACHINES:
