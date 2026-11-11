@@ -31,6 +31,7 @@ from binpacking import (
     profile_packing,
     true_frequencies,
 )
+from binpacking.env import environment
 from binpacking.instances import sample_items, weibull_dist
 
 ap = argparse.ArgumentParser(description=__doc__)
@@ -86,6 +87,7 @@ res = {"n_items": args.n, "capacity": K, "profile_size_m": args.m, "seeds": args
        "true_distribution": "round(45 * Weibull(shape 3)), clipped to 1..100",
        "wrong_distribution": "round(20 * Weibull(shape 3)), clipped to 1..100",
        "prediction_quality": average(rows, "delta"), "learned_predictions": average(learned, "sample_size")}
+res["environment"] = environment()
 (out / "results.json").write_text(json.dumps(res, indent=2))
 
 cols = ["first_fit", "best_fit", "profile_packing"] + [f"hybrid_{lam}" for lam in lams]
